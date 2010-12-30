@@ -1,0 +1,8 @@
+.DS_Store
+lowresmt-reord.pdf
+*.aux
+*.log
+*.bbl
+*.blg
+*.synctex.gz
+*~
