@@ -205,11 +205,18 @@ We empirically investigate the effect of all of these choices in \secref{sect:ev
 % ------------------------------------------------
 \section{Empirical Evaluation} \label{sect:eval}
 
-In this work, we assume that a phrase table induced from parallel data is given but estimate phrase pair reordering features from monolingual data.  We evaluate the induced reordering features in two ways: (a) compare the induced reordering preferences with those induced from bitext in the standard phrase-based MT pipeline using a metric we define below, and (b) use them in place of the bitext estimated reordering model in a complete SMT pipeline.
+In this work, we assume that a phrase table induced from parallel data is given but estimate phrase pair reordering features from monolingual data.  We evaluate the induced reordering features in two ways: (a) compare the induced reordering preferences with those induced from bitext in the standard phrase-based MT pipeline using a metric we define below, and (b) use them in place of the bitext estimated reordering model in a complete SMT pipeline. \todo{i.e. experiments -/B, -/-. -/M and, possibly, B/B, B/-. B/M}.
 
 \paraheader{Data.} We estimate our reordering features from (a subset of) the Gigaword corpus for English, Spanish, German, and the wikipedia data for Urdu.
 
 \paraheader{Evaluation metrics.} We evaluate the induced reordering both in the complete system and using the following metric. \todo{Define}.  Intuitively, it measures how well the monolingual reordering features agree with their bilingually estimated counterparts in their ordering preferences for a given phrase.
+
+\subsection{Longest vs. All Phrases}
+
+\subsection{Pruning Contextual Phrases}
+
+\subsection{Collecting Discontinuous Phrases}
+
 
 % ------------------------------------------------
 %\section*{Acknowledgments}
