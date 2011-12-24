@@ -76,7 +76,7 @@ The parameters of statistical models of translation are typically estimated from
 % ------------------------------------------------
 \section{Introduction}
 
-MT: (1) choose words (phrases) in the target language, (2) put them in the right order.  Both need parallel data, which is expensive.  In this work we address the reordering problem using monolingual data alone, which is cheap and plentiful. We study how the induced reordering model compares with its standard counterpart induced from parallel data.
+MT: (1) choose words (phrases) in the target language, (2) put them in the right order.  Both need parallel data, which is expensive.  In this work, we address the reordering problem using monolingual data alone, which is cheap and plentiful.  In this work, we assume that a phrase table is \emph{given} and only estimate the reordering features.  We study how the induced reordering model compares with its standard counterpart induced from parallel data.
 
 % ------------------------------------------------
 \section{Background} \label{sect:bckg}
@@ -205,9 +205,11 @@ We empirically investigate the effect of all of these choices in \secref{sect:ev
 % ------------------------------------------------
 \section{Empirical Evaluation} \label{sect:eval}
 
-\paraheader{Data} Data and languages.
+In this work, we assume that a phrase table induced from parallel data is given but estimate phrase pair reordering features from monolingual data.  We evaluate the induced reordering features in two ways: (a) compare the induced reordering preferences with those induced from bitext in the standard phrase-based MT pipeline using a metric we define below, and (b) use them in place of the bitext estimated reordering model in a complete SMT pipeline.
 
-\paraheader{Evaluation metrics.}  We evaluate our approach in two ways.  (1) plug the monolingually estimated reordering features into the Moses pipeline and see how it compares to the bilingually estimated reordering model, and (2) compare the ordering induced by our method to the standard bilingually estimated model using the following metrics...
+\paraheader{Data.} We estimate our reordering features from (a subset of) the Gigaword corpus for English, Spanish, German, and the wikipedia data for Urdu.
+
+\paraheader{Evaluation metrics.} We evaluate the induced reordering both in the complete system and using the following metric. \todo{Define}.  Intuitively, it measures how well the monolingual reordering features agree with their bilingually estimated counterparts in their ordering preferences for a given phrase.
 
 % ------------------------------------------------
 %\section*{Acknowledgments}
