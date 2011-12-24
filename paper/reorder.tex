@@ -46,7 +46,7 @@
 }
 
 
-\title{Learning Reordering Without Parallel Data}
+\title{Learning a Reordering Model Without Parallel Data}
 
 %\author{}
 % \author{Alex Klementiev \ \ \ \  Ann Irvine \ \ \ \ Chris Callison-Burch \ \ \ \ David Yarowsky \\
@@ -70,7 +70,7 @@
 \maketitle
 
 \begin{abstract}
-We propose a novel algorithm to estimate re-ordering probabilities from monolingual data.
+The parameters of statistical models of translation are typically estimated from large bilingual parallel corpora.  However, these resources are expensive to create and are unavailable for most language pairs.  In this work we consider estimating reordering probabilities for phrase-based machine translation from monolingual data alone.  We propose a novel algorithm and show it to be effective on three language pairs.
 \end{abstract}
 
 % ------------------------------------------------
@@ -107,6 +107,9 @@ In this work, we keep the definition of the reordering features, but estimate th
 \begin{algorithm}[t]
 
  \SetKwFunction{CollectOccurs}{CollectOccurs}
+ \SetKwFunction{CollectPreceding}{CollectPreceding}
+ \SetKwFunction{CollectFollowing}{CollectFollowing}
+ \SetKwFunction{CollectDisc}{CollectDisc}
  \SetKwBlock{Body}{}{}
  \SetCommentSty{text}
  \SetFuncSty{text}
@@ -150,9 +153,9 @@ In this work, we keep the definition of the reordering features, but estimate th
 
     \ForEach{sentence $s \in S$} {
       \ForEach{occurrence of phrase $r$ in $s$} {
-        $B \leftarrow B$ + $($longest preceding $r$ and in $R)$\;
-        $A \leftarrow A$ + $($longest following $r$ and in $R)$\;
-        $D \leftarrow D$ + $($longest discontinuous w/ $r$ and in $R)$\;
+        $B \leftarrow B$ $\cup$ \CollectPreceding{$r$, $R$}\;
+        $A \leftarrow A$ $\cup$ \CollectFollowing{$r$, $R$}\;
+        $D \leftarrow D$ $\cup$ \CollectDisc{$r$, $R$}\;
       }
     }
     
@@ -181,15 +184,23 @@ In this work, we keep the definition of the reordering features, but estimate th
 
 We now introduce a novel algorithm for estimating $p_o(\textnormal{orientation}|f,e)$ from two monolingual corpora instead a bitext.
 
-%\todo{ccb - rewrite the first paragraph}
 Figure \ref{fig:reorderfeats} illustrates how the phrase pair orientation statistics are estimated in the standard phrase-based SMT pipeline.  For a phrase pair like ($f =$ \emq{Profils}, $e =$ \emq{profile}), we count its orientation with the previously translated phrase pair ($f' =$ \emq{in Facebook}, $e' =$ \emq{Facebook}) across all translated sentence pairs in the bitext.  
 
 In our setup we do not have translated sentence pairs.  Instead, we look for monolingual sentences in the source corpus which contain the source phrase that we are interested in, like $f =$ \emq{Profils}, and at least one other phrase that we have a translation for, like $f' =$ \emq{in Facebook}.  We then look for all target language sentences in the target monolingual corpus that contain the translation of $f$ (here $e =$ \emq{profile}) and any translation of $f'$.  \figref{fig:monoreord} illustrates that it is possible to find evidence for $p_o(\textnormal{swapped}| \it{ Profils},\it{ profile})$, even from the non-parallel, non-translated sentences drawn from two independent monolingual corpora.  By looking for foreign sentences containing pairs of adjacent foreign phrases $(f, f')$ and English sentences containing their corresponding translations $(e, e')$, we are able to increment orientation counts for $(f, e)$ by looking at whether $e$ and $e'$ are adjacent, swapped, or discontinuous, much in the same way as in Fig.~\ref{fig:reorderfeats}.
 
-One subtly of our method is that \mtodo{Clearly define parameters so that we can tweak them in the evaluation section.}
+
 %In the phrase-based SMT pipeline, phrase pair orientation statistics are collected using word alignments.  We keep a similar reordering model formulation but infer its parameters from monolingual data instead.  The orientation information for a phrase pair ($f$, $e$) is collected from source and target sentences containing ($f$, $e$) as well as other phrase pairs.  Suppose one such sentence pair contains another pair of phrases ($f'$, $e'$), and that $f'$ is immediately adjacent to $f$.  The idea is to check whether $e'$ stays in the same order with $e$, swaps, or becomes discontinuous in the target sentence. Consider the simple example in \figref{fig:monoreord}: the phrase pair is ($f =$ \emq{profile}, $e =$ \emq{Profils}), and a given pair of non-parallel sentences also contains a phrase table entry ($f' =$ \emq{Facebook}, $e' =$ \emq{in Facebook}).  In this example, the phrase $f'$ preceding $f$ in the source sentence swaps order with $e$ in the target.  When we collect these counts over large monolingual corpora, we expect the swap, monotone, and discontinuous counts to provide good estimates for the orientation features (\figref{fig:algoreorder}).
 %Note that multiple phrases may immediately precede $f$ and appear in the phrase table; however, we only use the longest of them to collect reordering counts.  
-shorter and more frequent phrases (e.g. punctuation) are more likely to appear in multiple orientations with a given phrase, and therefore provide poor evidence of re-ordering.  Therefore, we (a) collect the longest contextual phrases (which also appear in the phrase table) for reordering feature estimation, and (b) prune the set of sentences so that we only keep a small set of least frequent contextual phrases (this has the effect of dropping many function words and punctuation marks and and relying more heavily on multi-word content phrases to estimate the reordering).\footnote{The pruning step has an additional benefit of minimizing the memory needed for orientation feature estimations.}
+
+Contextual phrases for a given phrase \code{r} are only collected (in \code{CollectPreceding}, \code{CollectFollowing}, and \code{CollectDisc} on figure \figref{fig:algoreorder}) if they also appear in phrase table \code{R}.  Note that shorter and more frequent phrases (e.g. punctuation) are more likely to appear in multiple orientations with a given phrase, and therefore provide poor evidence of re-ordering.  Therefore, when collecting contextual phrases for reordering feature estimation, we:
+
+\begin{itemize}
+  \item Keep only the longest contextual phrases (which also appear in the phrase table).
+  \item Prune the set of phrases so that we only keep a small set of least frequent contextual phrases (this has the effect of dropping many function words and punctuation marks and and relying more heavily on multi-word content phrases to estimate the reordering).\footnote{The pruning step has an additional benefit of minimizing the memory needed for orientation feature estimations.}
+  \item Do not look too far away from a given phrase when collecting discontiguous phrases in \code{CollectDisc}.
+\end{itemize}
+
+We empirically investigate the effect of all of these choices in \secref{sect:eval}.
 
 % ------------------------------------------------
 \section{Empirical Evaluation} \label{sect:eval}
