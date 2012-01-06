@@ -221,55 +221,60 @@ The extent to which reordering models contribute to overall MT performance varie
 
 %. \todo{i.e. experiments -/B, -/-. -/M and, possibly, B/B, B/-. B/M}.
 
-\begin{table}
+\begin{table}[t]
+\begin{small}
 \begin{center}
-\begin{tabular}{|c|c|c|c|c|}
+\begin{tabular}{|c|c|c|c|c|c|}
 \hline
-Wndw & Long & Dscntg & W/ Ph & W/O Ph \\
-Size & Only? &  Phrases & Pair Feats  & Pair Feats \\
+Exp & Wdw & Long & Prop.  & W/ Ph & W/O Ph \\
+Num & Size & Only? &  Dsc. & Feats  & Feats \\
 \hline
-\multicolumn{5}{|l|}{Spanish} \\
+\multicolumn{6}{|l|}{Spanish} \\
 \hline
-\multicolumn{3}{|l|}{Standard Biling. Reorder} & 21.87 & 21.54 \\ 
+\multicolumn{4}{|l|}{Standard Biling. Reorder} & 21.87 & 21.54 \\ 
 \hline
-\multicolumn{3}{|l|}{Distortion Baseline} & 21.54 & 4.00 \\ 
+\multicolumn{4}{|l|}{Distortion Baseline} & 21.54 & 4.00 \\ 
 \hline
-3 & Y & 1500 & {\bf 21.67} & {\bf 10.80} \\
+1 & 3 & Y & 3x & {\bf 21.67} & {\bf 10.80} \\
 \hline
-3 & Y & 50 & 21.44 & 9.85 \\
-3 & Y & All &  &  \\
-3 & N & 50 &  &  \\
-3 & N & All &  &  \\
-All & N & 1500 &  &  \\
+2 & 3 & N & 3x & 21.68 & 9.46 \\
+3 & 3 & Y & 1/10 & 21.44 & 9.85 \\
+4 & 3 & Y & All &  &  \\
+5& 3 & N & 1/10 &  &  \\
+6& 3 & N & All &  &  \\
+7& All & N & 3x &  &  \\
 \hline
 \hline
-\multicolumn{5}{|l|}{Urdu} \\
+\multicolumn{6}{|l|}{Urdu} \\
 \hline
-\multicolumn{3}{|l|}{Standard Biling. Reorder} & 19.57 & 11.49 \\ 
+\multicolumn{4}{|l|}{Standard Biling. Reorder} & 19.57 & 11.49 \\ 
 \hline
-\multicolumn{3}{|l|}{Distortion Baseline} & {\it 16.48} & {\it 6.85} \\ %UPDATE WITH DISTORTION NUMBERS: THESE ARE RANDOM
+\multicolumn{4}{|l|}{Distortion Baseline} & {\it 16.48} & {\it 6.85} \\ %UPDATE WITH DISTORTION NUMBERS: THESE ARE RANDOM
 \hline
-3 & Y & 1500 & {\bf 17.23} & {\bf 9.50} \\
+8 & 3 & Y & 3x & 17.23 & 9.50 \\
 \hline
-3 & Y & 50 & 15.26 & 2.94 \\
-3 & Y & All & 17.04 & {\bf 9.53} \\
-3 & N & 50 & 16.93 & 2.95 \\
-3 & N & All & {\bf 17.53} & 9.37 \\
-All & N & 1500 & 17.00 & 8.52 \\
+9 & 3 & N & 3x & 17.14 & 9.60 \\
+10 & 3 & Y & 1/10 & 15.26 & 2.94 \\
+11 & 3 & Y & All & 17.04 & 9.53 \\
+12 & 3 & N & 1/10 & 16.93 & 2.95 \\
+13 & 3 & N & All & 17.53 & 9.37 \\
+14 & All & N & 3x & 17.00 & 8.52 \\
 \hline
 \end{tabular}
 \end{center}
 \vskip -0.1in
-\caption{\label{bleu-table}BLEU score results on Spanish to English and Urdu to English translation. ``W/ Ph Pair Feats'' refers to experiments using phrase pair translation scores estimated over parallel text and ``W/O Ph Pair Feats'' refers to experiments using no phrase pair translation scores. Results using a distortion-based baseline as well as standard bilingually estimated features are given for each language. ``Wndw Size'' refers to the distance between discontiguous phrases in our reordering estimation algorithm, $CollectDisc$, and ``Long Only?'' refers to whether or not the model considers only the longest contextual phrase in the window. ``Dscntg Phrases'' refers to the number of low frequency discontiguous phrases that the model considers.}
+\caption{\label{bleu-table}BLEU score results on Spanish to English and Urdu to English translation. ``W/ Ph Feats'' refers to experiments using phrase pair translation scores estimated over parallel text and ``W/O Ph Feats'' refers to experiments using no phrase pair translation scores. Results using a distortion-based baseline as well as standard bilingually estimated features are given for each language. ``Wdw Size'' refers to the distance between discontiguous phrases in our reordering estimation algorithm, $CollectDisc$, and ``Long Only?'' refers to whether or not the model considers only the longest contextual phrase in the window. ``Prop. Dsc.'' refers to the number of low frequency discontiguous phrases that the model considers relative to the number of preceding and following phrases, usually 500 phrases each.}
 \vskip -0.15in
+\end{small}
 \end{table}
 
 
-\paraheader{Data.} We estimate our reordering features using subsets of the Spanish and English Gigaword corpora\footnote{LDC catalog numbers} for our Spanish MT experiments and from monolingual English and Urdu crawled web data for the our Urdu MT experiments. In all cases, we sampled about 1 million lines of each corpora with respect to the phrase table. Doing so ensured that the sampled sentences would be relevant for our phrases of interest and also minimized the computational time it took to compute the reordering models.
+\paraheader{Data.} We estimate our reordering features using subsets of the Spanish and English Gigaword corpora\footnote{LDC2009T21 and LDC2009T13} for our Spanish MT experiments and from monolingual English and Urdu crawled web data for the our Urdu MT experiments. In all cases, we sampled about 1 million lines of each corpora with respect to the phrase table. Doing so ensured that the sampled sentences would be relevant for our phrases of interest and also minimized the computational time it took to compute the reordering models.
 
 %\paraheader{Evaluation metrics.} %We evaluate the induced reordering both in the complete system and using the following metric. \todo{Define}.  Intuitively, it measures how well the monolingual reordering features agree with their bilingually estimated counterparts in their ordering preferences for a given phrase.
 
 \subsection{Longest vs. All Phrases}
+In the Spanish results, when phrase translation scores aren't used, considering only the longest contextual phrase in estimating reordering scores (Exp 1) proved to be a better strategy than using all contextual phrases (Exp 2). However, the Urdu results (Exp 8-9) are about the same for each condition. This is likely due to the fact that the Urdu phrase table, which is estimated from a much smaller parallel text than the Spanish table, is sparse so long phrases which we know how to translate (i.e. are in the phrase table) are not found in the context of a given Urdu phrase as often in Urdu monolingual text as in Spanish. 
 
 \subsection{Pruning Contextual Phrases}
 
