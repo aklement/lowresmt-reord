@@ -70,18 +70,22 @@
 \maketitle
 
 \begin{abstract}
-The parameters of statistical models of translation are typically estimated from large bilingual parallel corpora.  However, these resources are expensive to create and are unavailable for most language pairs.  In this work we consider estimating reordering probabilities for phrase-based machine translation from monolingual data alone.  We propose a novel algorithm and show it to be effective on three language pairs.
+The parameters of statistical models of translation are typically estimated from large bilingual parallel corpora.  However, these resources are expensive to create and are unavailable for most language pairs.  In this work we consider estimating reordering probabilities for a given set of phrase pairs using only source and target language independent, monolingual corpora. We propose a novel algorithm and show that using a monolingually estimated reordering model approaches the performance of the bilingually estimated model for Spanish and Urdu to English translation.
 \end{abstract}
 
 % ------------------------------------------------
 \section{Introduction}
 
-MT: (1) choose words (phrases) in the target language, (2) put them in the right order.  Both need parallel data, which is expensive.  In this work, we address the reordering problem using monolingual data alone, which is cheap and plentiful.  In this work, we assume that a phrase table is \emph{given} and only estimate the reordering features.  We study how the induced reordering model compares with its standard counterpart induced from parallel data.
+Given some input source language text, machine translation (MT) systems do the following: (1) choose corresponding target language words (or phrases or tree fragments), and (2) put them in the correct, grammatical order for the target language. Nearly all state of the art MT systems use sentence aligned parallel text to train models for doing both. However, such data does not exist for the majority of the world's languages and is expensive to create. Developing a statistical MT system which does not depend on parallel text way would allow us to build systems for translating languages which are out of reach for current models and existing data. 
+
+In Anonymous (2012), we presented our results estimating phrase pair translation probabilities (the first MT task) from source and target monolingual corpora, which are relatively plentiful and easy to collect. In this work, we use the same monolingual corpora to estimate reordering probabilities. We assume that a phrase table is given and only estimate the reordering model. This allows us to compare how our monolingually estimated model performs relative to a standard bilingually estimated model.
+
+%MT: (1) choose words (phrases) in the target language, (2) put them in the right order.  Both need parallel data, which is expensive.  In this work, we address the reordering problem using monolingual data alone, which is cheap and plentiful.  In this work, we assume that a phrase table is \emph{given} and only estimate the reordering features.  We study how the induced reordering model compares with its standard counterpart induced from parallel data.
 
 % ------------------------------------------------
 \section{Background} \label{sect:bckg}
 
-\mtodo{Brief background on MT, reordering models.}
+%\mtodo{Brief background on MT, reordering models.}
 
 Statistical machine translation (SMT) was first formulated as a series of probabilistic models that learn word-to-word correspondences from sentence-aligned bilingual parallel corpora \cite{Brown:1993}.  \nocite{Brown1988}
 %
@@ -89,7 +93,7 @@ Current methods, including {\em phrase-based} \cite{Och:2002,Koehn:2003} and {\e
 
 Each phrase pair $(e, f)$ has reordering parameters $p_o(\textnormal{orientation}|f,e)$ which indicate the distribution of its orientation with respect to the previously translated phrase. Orientations are {\it monotone, swap, discontinuous} \cite{tillman:2004:HLTNAACL,Kumar2004}, see \figref{fig:reorderfeats}. 
 
-In this work, we keep the definition of the reordering features, but estimate them from monolingual data alone. 
+In this work, we keep the definition of the reordering features, but estimate them from source and target language monolingual corpora alone. In Section \ref{sect:order}, we introduce our novel algorithm, and in Section \ref{sect:eval} we evaluate its performance. 
 
 \begin{figure}[t]
 \begin{center}
@@ -101,6 +105,32 @@ In this work, we keep the definition of the reordering features, but estimate th
 
 % ------------------------------------------------
 \section{Monolingual Reordering Estimation} \label{sect:order}
+
+
+\begin{figure}[t]
+%\vskip 0.1in
+\begin{center}
+%\vspace{-.85cm}
+\includegraphics[width=0.8 \linewidth]{../figures/monoreord/monoreord.pdf}
+%\vspace{-.25cm}
+\caption{Collecting phrase orientation statistics for a English-German phrase pair (\emq{profile}, \emq{Profils}) from non-parallel sentences (the German sentence translates as  \emq{Creating a Facebook profile is easy}). %The longest preceding phrase \emq{Facebook} in source, has a phrase table translation \emq{in Facebook} appearing after the target phrase.
+}
+\label{fig:monoreord}
+\end{center}
+\vskip -0.2in
+\end{figure}
+
+Here we introduce a novel algorithm for estimating $p_o(\textnormal{orientation}|f,e)$ from two monolingual corpora instead a bitext.
+
+Figure \ref{fig:reorderfeats} illustrates how the phrase pair orientation statistics are estimated in the standard phrase-based SMT pipeline.  For a phrase pair like ($f =$ \emq{Profils}, $e =$ \emq{profile}), we count its orientation with the previously translated phrase pair ($f' =$ \emq{in Facebook}, $e' =$ \emq{Facebook}) across all translated sentence pairs in the bitext.  
+
+In our setup we do not have translated sentence pairs.  Instead, we look for monolingual sentences in the source corpus which contain the source phrase that we are interested in, like $f =$ \emq{Profils}, and at least one other phrase that we have a translation for, like $f' =$ \emq{in Facebook}.  We then look for all target language sentences in the target monolingual corpus that contain the translation of $f$ (here $e =$ \emq{profile}) and any translation of $f'$.  \figref{fig:monoreord} illustrates that it is possible to find evidence for $p_o(\textnormal{swapped}| \it{ Profils},\it{ profile})$, even from the non-parallel, non-translated sentences drawn from two independent monolingual corpora.  By looking for foreign sentences containing pairs of adjacent foreign phrases $(f, f')$ and English sentences containing their corresponding translations $(e, e')$, we are able to increment orientation counts for $(f, e)$ by looking at whether $e$ and $e'$ are adjacent, swapped, or discontinuous, much in the same way as in Fig.~\ref{fig:reorderfeats}.
+
+
+
+
+
+
 
 \SetAlFnt{\relsize{-1.5}}
 
@@ -169,26 +199,6 @@ In this work, we keep the definition of the reordering features, but estimate th
 \end{algorithm}
 
 
-\begin{figure}[t]
-%\vskip 0.1in
-\begin{center}
-%\vspace{-.85cm}
-\includegraphics[width=0.8 \linewidth]{../figures/monoreord/monoreord.pdf}
-%\vspace{-.25cm}
-\caption{Collecting phrase orientation statistics for a English-German phrase pair (\emq{profile}, \emq{Profils}) from non-parallel sentences (the German sentence translates as  \emq{Creating a Facebook profile is easy}). %The longest preceding phrase \emq{Facebook} in source, has a phrase table translation \emq{in Facebook} appearing after the target phrase.
-}
-\label{fig:monoreord}
-\end{center}
-\vskip -0.2in
-\end{figure}
-
-We now introduce a novel algorithm for estimating $p_o(\textnormal{orientation}|f,e)$ from two monolingual corpora instead a bitext.
-
-Figure \ref{fig:reorderfeats} illustrates how the phrase pair orientation statistics are estimated in the standard phrase-based SMT pipeline.  For a phrase pair like ($f =$ \emq{Profils}, $e =$ \emq{profile}), we count its orientation with the previously translated phrase pair ($f' =$ \emq{in Facebook}, $e' =$ \emq{Facebook}) across all translated sentence pairs in the bitext.  
-
-In our setup we do not have translated sentence pairs.  Instead, we look for monolingual sentences in the source corpus which contain the source phrase that we are interested in, like $f =$ \emq{Profils}, and at least one other phrase that we have a translation for, like $f' =$ \emq{in Facebook}.  We then look for all target language sentences in the target monolingual corpus that contain the translation of $f$ (here $e =$ \emq{profile}) and any translation of $f'$.  \figref{fig:monoreord} illustrates that it is possible to find evidence for $p_o(\textnormal{swapped}| \it{ Profils},\it{ profile})$, even from the non-parallel, non-translated sentences drawn from two independent monolingual corpora.  By looking for foreign sentences containing pairs of adjacent foreign phrases $(f, f')$ and English sentences containing their corresponding translations $(e, e')$, we are able to increment orientation counts for $(f, e)$ by looking at whether $e$ and $e'$ are adjacent, swapped, or discontinuous, much in the same way as in Fig.~\ref{fig:reorderfeats}.
-
-
 %In the phrase-based SMT pipeline, phrase pair orientation statistics are collected using word alignments.  We keep a similar reordering model formulation but infer its parameters from monolingual data instead.  The orientation information for a phrase pair ($f$, $e$) is collected from source and target sentences containing ($f$, $e$) as well as other phrase pairs.  Suppose one such sentence pair contains another pair of phrases ($f'$, $e'$), and that $f'$ is immediately adjacent to $f$.  The idea is to check whether $e'$ stays in the same order with $e$, swaps, or becomes discontinuous in the target sentence. Consider the simple example in \figref{fig:monoreord}: the phrase pair is ($f =$ \emq{profile}, $e =$ \emq{Profils}), and a given pair of non-parallel sentences also contains a phrase table entry ($f' =$ \emq{Facebook}, $e' =$ \emq{in Facebook}).  In this example, the phrase $f'$ preceding $f$ in the source sentence swaps order with $e$ in the target.  When we collect these counts over large monolingual corpora, we expect the swap, monotone, and discontinuous counts to provide good estimates for the orientation features (\figref{fig:algoreorder}).
 %Note that multiple phrases may immediately precede $f$ and appear in the phrase table; however, we only use the longest of them to collect reordering counts.  
 
@@ -205,17 +215,67 @@ We empirically investigate the effect of all of these choices in \secref{sect:ev
 % ------------------------------------------------
 \section{Empirical Evaluation} \label{sect:eval}
 
-In this work, we assume that a phrase table induced from parallel data is given but estimate phrase pair reordering features from monolingual data.  We evaluate the induced reordering features in two ways: (a) compare the induced reordering preferences with those induced from bitext in the standard phrase-based MT pipeline using a metric we define below, and (b) use them in place of the bitext estimated reordering model in a complete SMT pipeline. \todo{i.e. experiments -/B, -/-. -/M and, possibly, B/B, B/-. B/M}.
+In this work, we assume that a phrase table and corresponding phrase pair translation scores are given\footnote{In our experiments, the phrase table and translation probabilities are estimated using parallel corpora. However, in principle, they could be estimated using any method, including one that only makes use of monolingual corpora.}, we but estimate phrase pair reordering features from monolingual data.  We use our monolingually induced reordering model in place of its bilingually estimated counterpart in a complete phrase-based SMT pipeline, and we evaluate end-to-end performance using BLEU. 
 
-\paraheader{Data.} We estimate our reordering features from (a subset of) the Gigaword corpus for English, Spanish, German, and the wikipedia data for Urdu.
+The extent to which reordering models contribute to overall MT performance varies by language. For example, our standard phrase-based SMT model trained on the Spanish-English parallel Europarl corpus achieves a BLEU score of 21.87. Dropping the bilingually estimated orientation-based reordering model and using a distortion-based model, which does not require any parallel data for training, instead results in a BLEU score of 21.54, only about 0.3 BLEU less. Because the difference is so small, it is difficult to evaluate an alternative reordering model. For this reason, we report BLEU scores using our reordering model in combination with bilingually estimated phrase pair translation scores (``W/ Ph Pair Feats'' in Table \ref{bleu-table}) as well as using no phrase pair translation scores at all (``W/O Ph Pair Feats'' in Table \ref{bleu-table}). 
 
-\paraheader{Evaluation metrics.} We evaluate the induced reordering both in the complete system and using the following metric. \todo{Define}.  Intuitively, it measures how well the monolingual reordering features agree with their bilingually estimated counterparts in their ordering preferences for a given phrase.
+%. \todo{i.e. experiments -/B, -/-. -/M and, possibly, B/B, B/-. B/M}.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+Wndw & Long & Dscntg & W/ Ph & W/O Ph \\
+Size & Only? &  Phrases & Pair Feats  & Pair Feats \\
+\hline
+\multicolumn{5}{|l|}{Spanish} \\
+\hline
+\multicolumn{3}{|l|}{Standard Biling. Reorder} & 21.87 & 21.54 \\ 
+\hline
+\multicolumn{3}{|l|}{Distortion Baseline} & 21.54 & 4.00 \\ 
+\hline
+3 & Y & 1500 & {\bf 21.67} & {\bf 10.80} \\
+\hline
+3 & Y & 50 & 21.44 & 9.85 \\
+3 & Y & All &  &  \\
+3 & N & 50 &  &  \\
+3 & N & All &  &  \\
+All & N & 1500 &  &  \\
+\hline
+\hline
+\multicolumn{5}{|l|}{Urdu} \\
+\hline
+\multicolumn{3}{|l|}{Standard Biling. Reorder} & 19.57 & 11.49 \\ 
+\hline
+\multicolumn{3}{|l|}{Distortion Baseline} & {\it 16.48} & {\it 6.85} \\ %UPDATE WITH DISTORTION NUMBERS: THESE ARE RANDOM
+\hline
+3 & Y & 1500 & {\bf 17.23} & {\bf 9.50} \\
+\hline
+3 & Y & 50 & 15.26 & 2.94 \\
+3 & Y & All & 17.04 & {\bf 9.53} \\
+3 & N & 50 & 16.93 & 2.95 \\
+3 & N & All & {\bf 17.53} & 9.37 \\
+All & N & 1500 & 17.00 & 8.52 \\
+\hline
+\end{tabular}
+\end{center}
+\vskip -0.1in
+\caption{\label{bleu-table}BLEU score results on Spanish to English and Urdu to English translation. ``W/ Ph Pair Feats'' refers to experiments using phrase pair translation scores estimated over parallel text and ``W/O Ph Pair Feats'' refers to experiments using no phrase pair translation scores. Results using a distortion-based baseline as well as standard bilingually estimated features are given for each language. ``Wndw Size'' refers to the distance between discontiguous phrases in our reordering estimation algorithm, $CollectDisc$, and ``Long Only?'' refers to whether or not the model considers only the longest contextual phrase in the window. ``Dscntg Phrases'' refers to the number of low frequency discontiguous phrases that the model considers.}
+\vskip -0.15in
+\end{table}
+
+
+\paraheader{Data.} We estimate our reordering features using subsets of the Spanish and English Gigaword corpora\footnote{LDC catalog numbers} for our Spanish MT experiments and from monolingual English and Urdu crawled web data for the our Urdu MT experiments. In all cases, we sampled about 1 million lines of each corpora with respect to the phrase table. Doing so ensured that the sampled sentences would be relevant for our phrases of interest and also minimized the computational time it took to compute the reordering models.
+
+%\paraheader{Evaluation metrics.} %We evaluate the induced reordering both in the complete system and using the following metric. \todo{Define}.  Intuitively, it measures how well the monolingual reordering features agree with their bilingually estimated counterparts in their ordering preferences for a given phrase.
 
 \subsection{Longest vs. All Phrases}
 
 \subsection{Pruning Contextual Phrases}
 
 \subsection{Collecting Discontinuous Phrases}
+
+\section{Conclusion}
 
 
 % ------------------------------------------------
