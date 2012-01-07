@@ -4,7 +4,7 @@
 \usepackage{latexsym}
 \usepackage{amsmath}
 \usepackage{multirow}
-\setlength\titlebox{1.5 cm}    % Expanding the titlebox
+\setlength\titlebox{1.65 cm}    % Expanding the titlebox
 \usepackage{url}
 \usepackage{color}
 \usepackage{colortbl}
@@ -78,7 +78,7 @@ The parameters of statistical models of translation are typically estimated from
 
 Given some input source language text, machine translation (MT) systems do the following: (1) choose corresponding target language words (or phrases or tree fragments), and (2) put them in the correct, grammatical order for the target language. Nearly all state of the art MT systems use sentence aligned parallel text to train models for doing both. However, such data does not exist for the majority of the world's languages and it is expensive to create. Developing a statistical MT system which does not depend on parallel text would allow us to build systems for translating languages which are out of reach for current models and existing data. 
 
-In Anonymous (2012), we presented our results estimating phrase pair translation probabilities (the first MT task) from source and target monolingual corpora, which are relatively plentiful and easy to collect. In this work, we use the same monolingual corpora to estimate reordering probabilities. We assume that a phrase table is given and only estimate the reordering model. This allows us to directly compare our monolingually estimated reordering model to a standard bilingually estimated reordering model.
+In Anonymous (2012), we presented our results estimating phrase pair translation probabilities (the first MT task) from source and target monolingual corpora, which are relatively plentiful and easy to collect. In this work, we use the same monolingual corpora to estimate reordering probabilities. We assume that a phrase table is given and only estimate the reordering model. This allows us to directly compare our monolingually estimated reordering model with a standard bilingually estimated reordering model.
 
 %MT: (1) choose words (phrases) in the target language, (2) put them in the right order.  Both need parallel data, which is expensive.  In this work, we address the reordering problem using monolingual data alone, which is cheap and plentiful.  In this work, we assume that a phrase table is \emph{given} and only estimate the reordering features.  We study how the induced reordering model compares with its standard counterpart induced from parallel data.
 
@@ -91,9 +91,9 @@ Statistical machine translation (SMT) was first formulated as a series of probab
 %
 Current methods, including {\em phrase-based} \cite{Och:2002,Koehn:2003} and {\em hierarchical} models \cite{Chiang:2005}, typically start by word-aligning a bilingual parallel corpus \cite{Och2003}.  They extract multi-word phrases that are consistent with the Viterbi word alignments, and use these phrases to build new translations.  Model parameters are estimated from large amounts of bitext.  One of those parameters is the reordering model
 
-Each phrase pair $(e, f)$ has reordering parameters $p_o(\textnormal{orientation}|f,e)$ which indicate the distribution of its orientation with respect to the previously translated phrase. Orientations are {\it monotone, swap, discontinuous} \cite{tillman:2004:HLTNAACL,Kumar2004,Koehn-EtAl:2005:IWSLT}, see \figref{fig:reorderfeats}. 
+In phrase-baesd machine translation, each phrase pair $(e, f)$ has reordering parameters $p_o(\textnormal{orientation}|f,e)$ which indicate the distribution of its orientation with respect to the previously translated phrase. Orientations are {\it monotone, swap, discontinuous} \cite{tillman:2004:HLTNAACL,Kumar2004,Koehn-EtAl:2005:IWSLT}, see \figref{fig:reorderfeats}. 
 
-In this work, we keep the definition of the reordering features, but estimate them from source and target language monolingual corpora alone. %In Section \ref{sect:order}, we introduce our novel algorithm, and in Section \ref{sect:eval} we evaluate its performance in end-to-end MT. 
+In this work, we keep the definition of phrase-based reordering features, but estimate them from source and target language monolingual corpora alone. %In Section \ref{sect:order}, we introduce our novel algorithm, and in Section \ref{sect:eval} we evaluate its performance in end-to-end MT. 
 
 
 
@@ -221,7 +221,7 @@ We empirically investigate the effect of all of these choices in \secref{sect:ev
 % ------------------------------------------------
 \section{Empirical Evaluation} \label{sect:eval}
 
-In this work, we assume that a phrase table and corresponding phrase pair translation scores are given\footnote{In our experiments, the phrase table and translation probabilities are estimated using parallel corpora. However, in principle, they could be estimated using any method, including one that only makes use of monolingual corpora.}, but we estimate phrase pair reordering features from monolingual data.  We use our monolingually induced reordering model in place of its bilingually estimated counterpart in a complete phrase-based SMT pipeline, and we evaluate end-to-end performance using BLEU. 
+In this work, we assume that a phrase table and corresponding phrase pair translation scores are given\footnote{In our experiments, the phrase table and translation probabilities are estimated using Europarl (Spanish) and NIST (Urdu) parallel corpora. However, in principle, they could be estimated using any method, including one that only makes use of monolingual corpora.}, but we estimate phrase pair reordering features from monolingual data.  We use our monolingually induced reordering model in place of its bilingually estimated counterpart in a complete phrase-based SMT pipeline, and we evaluate end-to-end performance using BLEU. 
 
 The extent to which reordering models contribute to overall MT performance varies by language. For example, our standard phrase-based SMT model trained on the Spanish-English parallel Europarl corpus achieves a BLEU score of 21.87. Dropping the bilingually estimated orientation-based reordering model and using a distortion-based model, which does not require any parallel data for training, instead results in a BLEU score of 21.54, only about 0.3 BLEU less. Because the difference is so small, it is difficult to evaluate an alternative reordering model. For this reason, we report BLEU scores using our reordering model in combination with bilingually estimated phrase pair translation scores as well as using no phrase pair translation scores at all (``W/ Ph Feats'' and ``W/O Ph Feats'', respectively, in Table \ref{bleu-table}). The latter is closer to our ultimate goal of doing SMT without parallel text, in which case we will estimate reordering features as well as phrase pair translation scores using monolingual corpora.
 
@@ -245,10 +245,10 @@ Num & Size & Only? &  Dsc. & Feats  & Feats \\
 \hline
 2 & 3 & N & 3x & 21.68 & 9.46 \\
 3 & 3 & Y & 1/10 & 21.44 & 9.85 \\
-4 & 3 & Y & Inf. &  &  \\
-5& 3 & N & 1/10 &  &  \\
-6& 3 & N & Inf. &  &  \\
-7& All & N & 3x &  &  \\
+%4 & 3 & Y & Inf. &  &  \\
+%5& 3 & N & 1/10 &  &  \\
+%6& 3 & N & Inf. &  &  \\
+%7& All & N & 3x &  &  \\
 \hline
 \multicolumn{4}{|l|}{Gain over baseline} & 0.13 & 6.80 \\ 
 \hline
@@ -259,14 +259,14 @@ Num & Size & Only? &  Dsc. & Feats  & Feats \\
 \hline
 \multicolumn{4}{|l|}{Distortion Baseline} & 16.89 & 10.04 \\
 \hline
-8 & 3 & Y & 3x & {\bf 17.23} & {\bf 9.50} \\
+4 & 3 & Y & 3x & {\bf 17.23} & {\bf 9.50} \\
 \hline
-9 & 3 & N & 3x & 17.14 & 9.60 \\
-10 & 3 & Y & 1/10 & 15.26 & 2.94 \\
-11 & 3 & Y & Inf. & 17.04 & 9.53 \\
-12 & 3 & N & 1/10 & 16.93 & 2.95 \\
-13 & 3 & N & Inf. & 17.53 & 9.37 \\
-14 & All & N & 3x & 17.00 & 8.52 \\
+5 & 3 & N & 3x & 17.14 & 9.60 \\
+6 & 3 & Y & 1/10 & 15.26 & 2.94 \\
+7 & 3 & Y & Inf. & 17.04 & 9.53 \\
+8 & 3 & N & 1/10 & 16.93 & 2.95 \\
+9 & 3 & N & Inf. & 17.53 & 9.37 \\
+10 & All & N & 3x & 17.00 & 8.52 \\
 \hline
 \multicolumn{4}{|l|}{Gain over baseline} & 0.34 & - \\ 
 \hline
@@ -283,21 +283,21 @@ Num & Size & Only? &  Dsc. & Feats  & Feats \\
 
 %\paraheader{Evaluation metrics.} %We evaluate the induced reordering both in the complete system and using the following metric. \todo{Define}.  Intuitively, it measures how well the monolingual reordering features agree with their bilingually estimated counterparts in their ordering preferences for a given phrase.
 
-Table \ref{bleu-table} shows our experimental results. Our baseline is a simple distortion-based reordering model. Nearly all of our experimental conditions outperform the baseline, in some cases by a very wide margin. In the following discussions, we refer to the experiment numbers shown in the left column and vary several algorithmic parameters. The best configuration, experiments 1 (Spanish) and 8 (Urdu), are bold. %in Table \ref{bleu-table} are best. 
+Table \ref{bleu-table} shows our experimental results. Our baseline is a simple distortion-based reordering model. Nearly all of our experimental conditions outperform the baseline, in some cases by a very wide margin. In the following discussions, we refer to the experiment numbers shown in the left column and vary several algorithmic parameters. The best configuration, experiments 1 (Spanish) and 4 (Urdu), are bold. %in Table \ref{bleu-table} are best. 
 
 \subsection{Longest vs. All Phrases}
-Here we compare results estimating reordering scores using (a) only the longest phrase (of those that we know how to translate) in the context of the given phrase of interest, $r$, and (b) all contextual phrases. We expect that using only the longest phrase will perform better because shorter, more frequent phrases are likely to appear in many positions relative to $r$. The Spanish results in Table \ref{bleu-table} show that when phrase translation scores aren't used, considering only the longest contextual phrase in estimating reordering scores (Exp 1) proved to be a better strategy than using all contextual phrases (Exp 2). However, the Urdu results (Exp 8-9) are about the same for each condition. This is likely due to the fact that the Urdu phrase table, which is estimated from a much smaller parallel text than the Spanish table, includes fewer long phrases.
+Here we compare results estimating reordering scores using (a) only the longest phrase (of those that we know how to translate) in the context of the given phrase of interest, $r$, and (b) all contextual phrases. We expect that using only the longest phrase will perform better because shorter, more frequent phrases are likely to appear in many positions relative to $r$. The Spanish results in Table \ref{bleu-table} show that when phrase translation scores aren't used, considering only the longest contextual phrase in estimating reordering scores (Exp 1) proved to be a better strategy than using all contextual phrases (Exp 2). However, the Urdu results (Exp 4-5) are about the same for each condition. This is likely due to the fact that the Urdu phrase table, which is estimated from a much smaller parallel text than the Spanish table, includes fewer long phrases.
 %sparse so long phrases which we know how to translate (i.e. are in the phrase table) are not found in the context of a given Urdu phrase as often in Urdu monolingual text as in Spanish. 
 
 \subsection{Pruning Contextual Phrases}
-We perform experiments varying the {\it number} of contextual phrases that we collect for a given phrase of interest, $r$. In additional experiments (omitted due to space constraints), we found that collecting enough low frequency phrases to make good estimates but not so many that we include very frequent phrases, which are likely to occur in many positions in a sentence relative to $r$, works well. In particular, we found that considering $500$ preceding and following contextual phrases and $1500$, or three times as many discontinuous phrases, yields good results. Additionally, we find that the {\it proportion} between the number of collected discontinuous phrases and preceding/following phrases affects results more than absolute numbers. This makes sense; varying the proportion of discontinuous phrases alters the model's general preference for discontinuous reorderings. Comparing Urdu experiment 8 with 10 and 11, and Spanish experiment 1 with 3 and 4, demonstrates performance drops, in some cases dramatically, both when (a) considering all discontinuous phrases, and (b) considering very few discontinuous phrases. %These results make sense; collecting a very small or huge amount of discontinuous phrases, relative to the other orientations, would result in relatively very high discontinuous reordering scores. 
+We perform experiments varying the {\it number} of contextual phrases that we collect for a given phrase of interest, $r$. In additional experiments (omitted due to space constraints), we found that collecting enough low frequency phrases to make good estimates but not so many that we include very frequent phrases, which are likely to occur in many positions in a sentence relative to $r$, works well. In particular, we found that considering $500$ preceding and following contextual phrases and $1500$, or three times as many discontinuous phrases, yields good results. Additionally, we find that the {\it proportion} between the number of collected discontinuous phrases and preceding/following phrases affects results more than absolute numbers. This makes sense; increasing the proportion of discontinuous phrases increases the model's general preference for discontinuous reorderings. Comparing Urdu experiment 4 with 6 and 7, and Spanish experiment 1 with 3, demonstrates performance drops, in some cases dramatically, both when (a) considering all discontinuous phrases, and (b) considering very few discontinuous phrases. %These results make sense; collecting a very small or huge amount of discontinuous phrases, relative to the other orientations, would result in relatively very high discontinuous reordering scores. 
 
 \subsection{Collecting Discontinuous Phrases}
 Finally, we vary the maximum allowed distance between our phrase of interest, $r$, and the discontinuous phrases that we collect. 
 %In Table \ref{bleu-table}, we present one experiment for each language pair that demonstrates the decrease in performance that results when discontinuous phrases are collected from anywhere in a given sentence, rather than within a narrow window of words around the phrases of interest. 
-When we collect discontinuous phrases from anywhere in the sentence instead of within a narrow window of words around $r$, performance drops (Spanish experiment 7, Urdu experiment 14).
+When we collect discontinuous phrases from anywhere in the sentence instead of within a narrow window of words around $r$, performance drops (Urdu experiment 10).
 %Urdu experiment 14, in contrast to 8, shows a modest drop in BLEU score under this condition when phrase translation scores are used and a larger drop when they are not. The same is shown in comparing Spanish experiment 7 with 1. 
-Intuitively, this is what we expect. Discontinuous phrases located very far away from our phrase of interest in a given sentence are unlikely to indicate anything about the reordering probabilities between the source and target phrases of interest.
+Intuitively, this is what we expect. Discontinuous phrases located far away from our phrase of interest in a given sentence are unlikely to indicate anything about the reordering probabilities between the source and target phrases of interest.
 
 
 \section{Conclusion}
@@ -308,7 +308,7 @@ In this work, we have presented a novel algorithm which is capable of estimating
 
 %Do not number the acknowledgment section.
 
-\vskip -0.25in
+\vskip -0.1in
 
 \bibliographystyle{naaclhlt2012}
 \bibliography{reorder}
